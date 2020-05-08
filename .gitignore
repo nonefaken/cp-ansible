@@ -3,3 +3,4 @@
 *.pyc
 *.idea
 generated_ssl_files/
+aig787-confluentinc_cp-*.tar.gz

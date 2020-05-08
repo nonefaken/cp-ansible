@@ -6,6 +6,13 @@
     name: aig787.confluentinc_cp.common
   when: not common_role_completed|bool
 
+- name: Gather Zookeeper Hostnames
+  setup:
+  delegate_to: "{{ item }}"
+  delegate_facts: yes
+  when: hostvars[item]["ansible_fqdn"] is not defined
+  with_items: "{{ groups['zookeeper'] }}"
+
 - name: Install the Kafka Broker Packages
   yum:
     name: "{{item}}{{confluent_package_redhat_suffix}}"
@@ -39,7 +46,7 @@
     keystore_storepass: "{{kafka_broker_keystore_storepass}}"
     keystore_keypass: "{{kafka_broker_keystore_keypass}}"
     service_name: kafka_broker
-    hostnames: "{{ kafka_broker_listeners | aig787.confluentinc_cp.get_hostnames(inventory_hostname) | unique }}"
+    hostnames: "{{ kafka_broker_listeners | aig787.confluentinc_cp.get_hostnames(hostvars[inventory_hostname]['ansible_fqdn']) | unique }}"
   when: kafka_broker_listeners | aig787.confluentinc_cp.ssl_required(ssl_enabled)
 
 - name: Configure Kerberos
@@ -176,10 +183,9 @@
     name: "{{kafka_broker_service_name}}"
     enabled: yes
     state: started
-
-- name: Wait for Under Replicated Partitions on Broker
-  include_tasks: wait_for_urp.yml
-  when:
-    - health_checks_enabled|bool
-    - jolokia_enabled|bool
-    - not ansible_check_mode
+# - name: Wait for Under Replicated Partitions on Broker
+#   include_tasks: wait_for_urp.yml
+#   when:
+#     - health_checks_enabled|bool
+#     - jolokia_enabled|bool
+#     - not ansible_check_mode

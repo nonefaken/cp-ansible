@@ -6,6 +6,13 @@
     name: aig787.confluentinc_cp.common
   when: not common_role_completed|bool
 
+- name: Gather Schema Registry and Kafka Hostnames
+  setup:
+  delegate_to: "{{ item }}"
+  delegate_facts: yes
+  when: hostvars[item]["ansible_fqdn"] is not defined
+  with_items: "{{ groups['schema_registry'] +  groups['kafka_broker'] }}"
+
 # Install Packages
 - name: Install the Kafka Rest Packages
   yum:
@@ -41,7 +48,7 @@
     keystore_storepass: "{{kafka_rest_keystore_storepass}}"
     keystore_keypass: "{{kafka_rest_keystore_keypass}}"
     service_name: kafka_rest
-    hostnames: "{{ [inventory_hostname] }}"
+    hostnames: "{{ [ansible_fqdn] }}"
   when: kafka_rest_ssl_enabled|bool or kafka_broker_listeners[kafka_rest_kafka_listener_name]['ssl_enabled'] | default(ssl_enabled) | bool
 
 - name: Configure Kerberos

@@ -5,7 +5,7 @@
 
 # Schema Registry Configuration
 listeners={{schema_registry_http_protocol}}://0.0.0.0:{{schema_registry_listener_port}}
-host.name={{inventory_hostname}}
+host.name={{ansible_fqdn}}
 inter.instance.protocol={{schema_registry_http_protocol}}
 {% if schema_registry_ssl_enabled|bool %}
 security.protocol=SSL
@@ -21,7 +21,7 @@ ssl.client.auth=false
 {% endif %}
 
 # Kafka Broker Configuration
-kafkastore.bootstrap.servers={% for host in groups['kafka_broker'] %}{% if loop.index > 1%},{% endif %}{{ host }}:{{kafka_broker_listeners[schema_registry_kafka_listener_name]['port']}}{% endfor %}
+kafkastore.bootstrap.servers={% for host in groups['kafka_broker'] %}{% if loop.index > 1%},{% endif %}{{ hostvars[host]['ansible_fqdn'] }}:{{kafka_broker_listeners[schema_registry_kafka_listener_name]['port']}}{% endfor %}
 
 kafkastore.security.protocol={{kafka_broker_listeners[schema_registry_kafka_listener_name] | aig787.confluentinc_cp.kafka_protocol_defaults(sasl_protocol, ssl_enabled) }}
 {% if kafka_broker_listeners[schema_registry_kafka_listener_name]['ssl_enabled'] | default(ssl_enabled) | bool %}
