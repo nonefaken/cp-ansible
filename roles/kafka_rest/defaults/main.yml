@@ -1,5 +1,5 @@
 kafka_rest_jolokia_java_arg_buildout: "-javaagent:{{jolokia_jar_path}}=port={{kafka_rest_jolokia_port}},host=0.0.0.0"
-kafka_rest_log4j_java_arg_buildout: "-Dlog4j.configuration=file:{{kafka_rest.log4j_file}}"
+kafka_rest_log4j_java_arg_buildout: "-Dlog4j.configuration=file:{{kafka_rest_config.log4j_file}}"
 
 kafka_rest_custom_log4j: "{{ custom_log4j }}"
 

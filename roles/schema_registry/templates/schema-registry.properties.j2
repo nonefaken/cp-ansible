@@ -1,5 +1,5 @@
 # Maintained by Ansible
-{% for key, value in schema_registry.properties.items() %}
+{% for key, value in schema_registry_config.properties.items() %}
 {{key}}={{value}}
 {% endfor %}
 
@@ -36,7 +36,7 @@ kafkastore.ssl.key.password={{schema_registry_keystore_keypass}}
 {% if kafka_broker_listeners[schema_registry_kafka_listener_name]['sasl_protocol'] | default(sasl_protocol) | aig787.confluentinc_cp.normalize_sasl_protocol == 'PLAIN' %}
 kafkastore.sasl.mechanism=PLAIN
 kafkastore.sasl.jaas.config=org.apache.kafka.common.security.plain.PlainLoginModule required \
-   username="{{sasl_plain_users.schema_registry.principal}}" password="{{sasl_plain_users.schema_registry.password}}";
+   username="{{sasl_plain_users_config.schema_registry.principal}}" password="{{sasl_plain_users_config.schema_registry.password}}";
 {% endif %}
 {% if kafka_broker_listeners[schema_registry_kafka_listener_name]['sasl_protocol'] | default(sasl_protocol) | aig787.confluentinc_cp.normalize_sasl_protocol == 'GSSAPI' %}
 kafkastore.sasl.mechanism=GSSAPI
@@ -50,5 +50,5 @@ kafkastore.sasl.jaas.config=com.sun.security.auth.module.Krb5LoginModule require
 {% if kafka_broker_listeners[schema_registry_kafka_listener_name]['sasl_protocol'] | default(sasl_protocol) | aig787.confluentinc_cp.normalize_sasl_protocol == 'SCRAM-SHA-256' %}
 kafkastore.sasl.mechanism=SCRAM-SHA-256
 kafkastore.sasl.jaas.config=org.apache.kafka.common.security.scram.ScramLoginModule required \
-   username="{{sasl_scram_users.schema_registry.principal}}" password="{{sasl_scram_users.schema_registry.password}}";
+   username="{{sasl_scram_users_config.schema_registry.principal}}" password="{{sasl_scram_users_config.schema_registry.password}}";
 {% endif %}

@@ -1,5 +1,5 @@
 kafka_connect_jolokia_java_arg_buildout: "-javaagent:{{jolokia_jar_path}}=port={{kafka_connect_jolokia_port}},host=0.0.0.0"
-kafka_connect_log4j_java_arg_buildout: "-Dlog4j.configuration=file:{{kafka_connect.log4j_file}}"
+kafka_connect_log4j_java_arg_buildout: "-Dlog4j.configuration=file:{{kafka_connect_config.log4j_file}}"
 
 kafka_connect_custom_log4j: "{{ custom_log4j }}"
 
@@ -36,7 +36,7 @@ kafka_connect_plugins: []
 kafka_connect_plugins_remote: []
 kafka_connect_plugins_dest: /usr/share/java
 
-kafka_connect:
+kafka_connect_default:
   appender_log_path: /var/log/kafka/
   appender_log_name: connect-distributed.log
   appender_max_log_files: 10

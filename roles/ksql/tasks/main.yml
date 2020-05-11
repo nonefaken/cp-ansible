@@ -11,7 +11,16 @@
   delegate_to: "{{ item }}"
   delegate_facts: yes
   when: hostvars[item]["ansible_fqdn"] is not defined
-  with_items: "{{ groups['schema_registry'] +  groups['kafka_broker'] }}"
+  with_items: "{{ groups['kafka_broker'] }}"
+
+- block:
+    - name: Gather Schema Registry hostnames
+      setup:
+      delegate_to: "{{ item }}"
+      delegate_facts: yes
+      when: hostvars[item]["ansible_fqdn"] is not defined
+      with_items: "{{ groups['schema_registry'] }}"
+  when: groups['schema_registry'] is defined
 
 # Install Packages
 - name: Install the KSQL Packages
@@ -41,7 +50,7 @@
 
 - name: Set Ksql streams dir permissions
   file:
-    path: "{{ksql.properties['ksql.streams.state.dir']}}"
+    path: "{{ksql_config.properties['ksql.streams.state.dir']}}"
     owner: "{{ksql_user}}"
     group: "{{ksql_group}}"
     state: directory
@@ -80,7 +89,7 @@
 - name: Create Ksql Config
   template:
     src: ksql-server.properties.j2
-    dest: "{{ksql.config_file}}"
+    dest: "{{ksql_config_file}}"
     mode: 0640
     owner: "{{ksql_user}}"
     group: "{{ksql_group}}"
@@ -89,7 +98,7 @@
 
 - name: Create Logs Directory
   file:
-    path: "{{ksql.appender_log_path}}"
+    path: "{{ksql_config.appender_log_path}}"
     state: directory
     group: "{{ksql_group}}"
     owner: "{{ksql_user}}"
@@ -98,7 +107,7 @@
 - name: Create Ksql log4j Config
   template:
     src: ksql-server_log4j.properties.j2
-    dest: "{{ksql.log4j_file}}"
+    dest: "{{ksql_config.log4j_file}}"
     mode: 0640
     owner: "{{ksql_user}}"
     group: "{{ksql_group}}"
@@ -108,7 +117,7 @@
 - name: Ksql Jaas Config
   template:
     src: ksql-server_jaas.conf.j2
-    dest: "{{ksql.jaas_file}}"
+    dest: "{{ksql_config.jaas_file}}"
     mode: 0640
     owner: "{{ksql_user}}"
     group: "{{ksql_group}}"
@@ -118,7 +127,7 @@
 
 - name: Create Service Override Directory
   file:
-    path: "{{ksql.systemd_override | dirname}}"
+    path: "{{ksql_systemd_override | dirname}}"
     owner: "{{ksql_user}}"
     group: "{{ksql_group}}"
     state: directory
@@ -127,7 +136,7 @@
 - name: Write Service Overrides
   template:
     src: override.conf.j2
-    dest: "{{ksql.systemd_override}}"
+    dest: "{{ksql_systemd_override}}"
     mode: 0640
     owner: "{{ksql_user}}"
     group: "{{ksql_group}}"

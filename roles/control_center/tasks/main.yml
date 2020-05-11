@@ -6,6 +6,40 @@
     name: aig787.confluentinc_cp.common
   when: not common_role_completed|bool
 
+- name: Gather Kafka hostnames
+  setup:
+  delegate_to: "{{ item }}"
+  delegate_facts: yes
+  when: hostvars[item]["ansible_fqdn"] is not defined
+  with_items: "{{ groups['kafka_broker'] }}"
+
+- block:
+    - name: Gather Schema Registry hostnames
+      setup:
+      delegate_to: "{{ item }}"
+      delegate_facts: yes
+      when: hostvars[item]["ansible_fqdn"] is not defined
+      with_items: "{{ groups['schema_registry'] }}"
+  when: groups['schema_registry'] is defined
+
+- block:
+    - name: Gather Kafka Connect hostnames
+      setup:
+      delegate_to: "{{ item }}"
+      delegate_facts: yes
+      when: hostvars[item]["ansible_fqdn"] is not defined
+      with_items: "{{ groups['kafka_connect'] }}"
+  when: groups['kafka_connect'] is defined
+
+- block:
+    - name: Gather KSQL hostnames
+      setup:
+      delegate_to: "{{ item }}"
+      delegate_facts: yes
+      when: hostvars[item]["ansible_fqdn"] is not defined
+      with_items: "{{ groups['ksql'] }}"
+  when: groups['ksql'] is defined
+
 # Install Packages
 - name: Install the Control Center Packages
   yum:
@@ -34,7 +68,7 @@
 
 - name: Set Control Center Data Dir permissions
   file:
-    path: "{{control_center.properties['confluent.controlcenter.data.dir']}}"
+    path: "{{control_center_config.properties['confluent.controlcenter.data.dir']}}"
     owner: "{{control_center_user}}"
     group: "{{control_center_group}}"
     state: directory
@@ -42,7 +76,7 @@
 
 - name: Set Control Center Data Dir file permissions
   file:
-    path: "{{control_center.properties['confluent.controlcenter.data.dir']}}"
+    path: "{{control_center_config.properties['confluent.controlcenter.data.dir']}}"
     owner: "{{control_center_user}}"
     group: "{{control_center_group}}"
     recurse: true
@@ -72,7 +106,7 @@
 - name: Create Control Center Config
   template:
     src: control-center.properties.j2
-    dest: "{{control_center.config_file}}"
+    dest: "{{control_center_config_file}}"
     mode: 0640
     owner: "{{control_center_user}}"
     group: "{{control_center_group}}"
@@ -87,7 +121,7 @@
 
 - name: Create Logs Directory
   file:
-    path: "{{control_center.appender_log_path}}"
+    path: "{{control_center_config.appender_log_path}}"
     state: directory
     group: "{{control_center_group}}"
     owner: "{{control_center_user}}"
@@ -113,7 +147,7 @@
 - name: Create Control Center log4j Config
   template:
     src: control-center_log4j.properties.j2
-    dest: "{{control_center.log4j_file}}"
+    dest: "{{control_center_config.log4j_file}}"
     mode: 0640
     owner: "{{control_center_user}}"
     group: "{{control_center_group}}"
@@ -122,7 +156,7 @@
 
 - name: Create Service Override Directory
   file:
-    path: "{{control_center.systemd_override | dirname}}"
+    path: "{{control_center_systemd_override | dirname}}"
     state: directory
     owner: "{{control_center_user}}"
     group: "{{control_center_group}}"
@@ -131,7 +165,7 @@
 - name: Write Service Overrides
   template:
     src: override.conf.j2
-    dest: "{{control_center.systemd_override}}"
+    dest: "{{control_center_systemd_override}}"
     mode: 0640
     owner: "{{control_center_user}}"
     group: "{{control_center_group}}"

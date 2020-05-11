@@ -6,12 +6,21 @@
     name: aig787.confluentinc_cp.common
   when: not common_role_completed|bool
 
-- name: Gather Schema Registry and Kafka Hostnames
+- name: Gather Kafka Hostnames
   setup:
   delegate_to: "{{ item }}"
   delegate_facts: yes
   when: hostvars[item]["ansible_fqdn"] is not defined
-  with_items: "{{ groups['schema_registry'] +  groups['kafka_broker'] }}"
+  with_items: "{{ groups['kafka_broker'] }}"
+
+- block:
+    - name: Gather Schema Registry hostnames
+      setup:
+      delegate_to: "{{ item }}"
+      delegate_facts: yes
+      when: hostvars[item]["ansible_fqdn"] is not defined
+      with_items: "{{ groups['schema_registry'] }}"
+  when: groups['schema_registry'] is defined
 
 # Install Packages
 - name: Install the Kafka Connect Packages
@@ -64,7 +73,7 @@
 - name: Create Connect Distributed Config
   template:
     src: connect-distributed.properties.j2
-    dest: "{{kafka_connect.config_file}}"
+    dest: "{{kafka_connect_config_file}}"
     mode: 0640
     owner: "{{kafka_connect_user}}"
     group: "{{kafka_connect_group}}"
@@ -76,7 +85,7 @@
 
 - name: Create Logs Directory
   file:
-    path: "{{kafka_connect.appender_log_path}}"
+    path: "{{kafka_connect_config.appender_log_path}}"
     state: directory
     group: "{{kafka_connect_group}}"
     owner: "{{kafka_connect_user}}"
@@ -85,7 +94,7 @@
 - name: Create Connect Distributed log4j Config
   template:
     src: connect_distributed_log4j.properties.j2
-    dest: "{{kafka_connect.log4j_file}}"
+    dest: "{{kafka_connect_config.log4j_file}}"
     mode: 0640
     owner: "{{kafka_connect_user}}"
     group: "{{kafka_connect_group}}"
@@ -94,7 +103,7 @@
 
 - name: Create Service Override Directory
   file:
-    path: "{{kafka_connect.systemd_override | dirname}}"
+    path: "{{kafka_connect_systemd_override | dirname}}"
     owner: "{{kafka_connect_user}}"
     group: "{{kafka_connect_group}}"
     state: directory
@@ -103,7 +112,7 @@
 - name: Write Service Overrides
   template:
     src: override.conf.j2
-    dest: "{{ kafka_connect.systemd_override }}"
+    dest: "{{ kafka_connect_systemd_override }}"
     mode: 0640
     owner: "{{kafka_connect_user}}"
     group: "{{kafka_connect_group}}"

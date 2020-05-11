@@ -51,7 +51,7 @@ rbac_enabled: false
 confluent_server_enabled: true
 
 health_checks_enabled: true
-zookeeper_health_check_command: "exec 42<>/dev/tcp/127.0.0.1/{{zookeeper.properties.clientPort}}; echo -e 'srvr' >&42; cat <&42"
+zookeeper_health_check_command: "exec 42<>/dev/tcp/127.0.0.1/{{zookeeper_config.properties.clientPort}}; echo -e 'srvr' >&42; cat <&42"
 
 common_role_completed: false
 
@@ -77,11 +77,14 @@ ssl_self_signed_ca_password: capassword123
 
 zookeeper_user: "{{zookeeper_default_user}}"
 zookeeper_group: "{{zookeeper_default_group}}"
-zookeeper:
+zookeeper_global:
   properties:
     clientPort: 2181
   log4j_file: /etc/kafka/zookeeper_log4j.properties
   jaas_file: /etc/kafka/zookeeper_jaas.conf
+zookeeper_overrides: "{{ zookeeper | default({}) }}"
+zookeeper_default_or_empty: "{{ zookeeper_default | default({}) }}"
+zookeeper_config: "{{ zookeeper_global | combine(zookeeper_default_or_empty, zookeeper_overrides, recursive=True) }}"
 
 kafka_broker_default_listeners:
   external:
@@ -113,10 +116,13 @@ kafka_broker_keystore_path: "/var/ssl/private/kafka_broker.keystore.jks"
 kafka_broker_truststore_storepass: "{{ ssl_truststore_password if ssl_provided_keystore_and_truststore|bool else 'confluenttruststorepass'}}"
 kafka_broker_keystore_storepass: "{{ ssl_keystore_store_password if ssl_provided_keystore_and_truststore|bool else 'confluentkeystorestorepass'}}"
 kafka_broker_keystore_keypass: "{{ ssl_keystore_key_password if ssl_provided_keystore_and_truststore|bool else kafka_broker_keystore_storepass }}"
-kafka_broker:
+kafka_broker_global:
   log4j_file: /etc/kafka/kafka_server_log4j.properties
   jaas_file: /etc/kafka/kafka_server_jaas.conf
 kafka_broker_schema_validation_enabled: false
+kafka_broker_overrides: "{{ kafka_broker | default({}) }}"
+kafka_broker_default_or_empty: "{{ kafka_broker_default | default({}) }}"
+kafka_broker_config: "{{ kafka_broker_global | combine(kafka_broker_default_or_empty, kafka_broker_overrides, recursive=True) }}"
 
 schema_registry_user: "{{schema_registry_default_user}}"
 schema_registry_group: "{{schema_registry_default_group}}"
@@ -130,8 +136,11 @@ schema_registry_truststore_storepass: "{{ ssl_truststore_password if ssl_provide
 schema_registry_keystore_storepass: "{{ ssl_keystore_store_password if ssl_provided_keystore_and_truststore|bool else 'confluentkeystorestorepass'}}"
 schema_registry_keystore_keypass: "{{ ssl_keystore_key_password if ssl_provided_keystore_and_truststore|bool else schema_registry_keystore_storepass }}"
 schema_registry_kafka_listener_name: external
-schema_registry:
+schema_registry_global:
   log4j_file: /etc/schema-registry/schema_registry_log4j.properties
+schema_registry_overrides: "{{ schema_registry | default({}) }}"
+schema_registry_default_or_empty: "{{ schema_registry_default | default({}) }}"
+schema_registry_config: "{{ schema_registry_global | combine(schema_registry_default_or_empty, schema_registry_overrides, recursive=True) }}"
 
 kafka_rest_user: "{{kafka_rest_default_user}}"
 kafka_rest_group: "{{kafka_rest_default_group}}"
@@ -145,8 +154,11 @@ kafka_rest_truststore_storepass: "{{ ssl_truststore_password if ssl_provided_key
 kafka_rest_keystore_storepass: "{{ ssl_keystore_store_password if ssl_provided_keystore_and_truststore|bool else 'confluentkeystorestorepass'}}"
 kafka_rest_keystore_keypass: "{{ ssl_keystore_key_password if ssl_provided_keystore_and_truststore|bool else kafka_rest_keystore_storepass }}"
 kafka_rest_kafka_listener_name: external
-kafka_rest:
+kafka_rest_global:
   log4j_file: /etc/kafka-rest/kafka-rest_log4j.properties
+kafka_rest_overrides: "{{ kafka_rest | default({}) }}"
+kafka_rest_default_or_empty: "{{ kafka_rest_default | default({}) }}"
+kafka_rest_config: "{{ kafka_rest_global | combine(kafka_rest_default_or_empty, kafka_rest_overrides, recursive=True) }}"
 
 kafka_connect_user: "{{kafka_connect_default_user}}"
 kafka_connect_group: "{{kafka_connect_default_group}}"
@@ -160,8 +172,11 @@ kafka_connect_truststore_storepass: "{{ ssl_truststore_password if ssl_provided_
 kafka_connect_keystore_storepass: "{{ ssl_keystore_store_password if ssl_provided_keystore_and_truststore|bool else 'confluentkeystorestorepass'}}"
 kafka_connect_keystore_keypass: "{{ ssl_keystore_key_password if ssl_provided_keystore_and_truststore|bool else kafka_connect_keystore_storepass }}"
 kafka_connect_kafka_listener_name: external
-kafka_connect:
+kafka_connect_global:
   log4j_file: /etc/kafka/connect_distributed_log4j.properties
+kafka_connect_overrides: "{{ kafka_connect | default({}) }}"
+kafka_connect_default_or_empty: "{{ kafka_connect_default | default({}) }}"
+kafka_connect_config: "{{ kafka_connect_global | combine(kafka_connect_default_or_empty, kafka_connect_overrides, recursive=True) }}"
 
 ksql_user: "{{ksql_default_user}}"
 ksql_group: "{{ksql_default_group}}"
@@ -175,9 +190,12 @@ ksql_truststore_storepass: "{{ ssl_truststore_password if ssl_provided_keystore_
 ksql_keystore_storepass: "{{ ssl_keystore_store_password if ssl_provided_keystore_and_truststore|bool else 'confluentkeystorestorepass'}}"
 ksql_keystore_keypass: "{{ ssl_keystore_key_password if ssl_provided_keystore_and_truststore|bool else ksql_keystore_storepass }}"
 ksql_kafka_listener_name: external
-ksql:
+ksql_global:
   log4j_file: /etc/ksql/ksql-server_log4j.properties
   jaas_file: /etc/ksql/ksql-server_jaas.conf
+ksql_overrides: "{{ ksql | default({}) }}"
+ksql_default_or_empty: "{{ ksql_default | default({}) }}"
+ksql_config: "{{ ksql_global | combine(ksql_default_or_empty, ksql_overrides, recursive=True) }}"
 
 control_center_user: "{{control_center_default_user}}"
 control_center_group: "{{control_center_default_group}}"
@@ -192,10 +210,13 @@ control_center_truststore_storepass: "{{ ssl_truststore_password if ssl_provided
 control_center_keystore_storepass: "{{ ssl_keystore_store_password if ssl_provided_keystore_and_truststore|bool else 'confluentkeystorestorepass'}}"
 control_center_keystore_keypass: "{{ ssl_keystore_key_password if ssl_provided_keystore_and_truststore|bool else control_center_keystore_storepass }}"
 control_center_kafka_listener_name: external
-control_center:
+control_center_global:
   log4j_file: /etc/confluent-control-center/control-center_log4j.properties
+control_center_overrides: "{{ control_center | default({}) }}"
+control_center_default_or_empty: "{{ control_center_default | default({}) }}"
+control_center_config: "{{ control_center_global | combine(control_center_default_or_empty, control_center_overrides, recursive=True) }}"
 
-sasl_scram_users:
+sasl_scram_users_global:
   admin:
     principal: admin
     password: admin-secret
@@ -217,8 +238,10 @@ sasl_scram_users:
   schema_registry:
     principal: schema_registry
     password: schema_registry-secret
+sasl_scram_users_overrides: "{{ sasl_scram_users | default({}) }}"
+sasl_scram_users_config: "{{ sasl_scram_users_global | combine(sasl_scram_users_overrides, recursive=True) }}"
 
-sasl_plain_users:
+sasl_plain_users_global:
   admin:
     principal: admin
     password: admin-secret
@@ -240,3 +263,5 @@ sasl_plain_users:
   schema_registry:
     principal: schema_registry
     password: schema_registry-secret
+sasl_plain_users_overrides: "{{ sasl_plain_users | default({}) }}"
+sasl_plain_users_config: "{{ sasl_plain_users_global | combine(sasl_plain_users_overrides, recursive=True) }}"

@@ -10,7 +10,7 @@ confluent.controlcenter.rest.ssl.truststore.password={{control_center_truststore
 {% endif %}
 {% endif %}
 
-{% set cfg = control_center.properties %}
+{% set cfg = control_center_config.properties %}
 {% for key, value in cfg.items() %}
 {{key}}={{value}}
 {% endfor %}
@@ -31,7 +31,7 @@ confluent.controlcenter.streams.ssl.key.password={{control_center_keystore_keypa
 {% if kafka_broker_listeners[control_center_kafka_listener_name]['sasl_protocol'] | default(sasl_protocol) | aig787.confluentinc_cp.normalize_sasl_protocol == 'PLAIN' %}
 confluent.controlcenter.streams.sasl.mechanism=PLAIN
 confluent.controlcenter.streams.sasl.jaas.config=org.apache.kafka.common.security.plain.PlainLoginModule required \
-   username="{{sasl_plain_users.control_center.principal}}" password="{{sasl_plain_users.control_center.password}}";
+   username="{{sasl_plain_users_config.control_center.principal}}" password="{{sasl_plain_users_config.control_center.password}}";
 {% endif %}
 {% if kafka_broker_listeners[control_center_kafka_listener_name]['sasl_protocol'] | default(sasl_protocol) | aig787.confluentinc_cp.normalize_sasl_protocol == 'GSSAPI' %}
 confluent.controlcenter.streams.sasl.mechanism=GSSAPI
@@ -45,7 +45,7 @@ confluent.controlcenter.streams.sasl.jaas.config=com.sun.security.auth.module.Kr
 {% if kafka_broker_listeners[control_center_kafka_listener_name]['sasl_protocol'] | default(sasl_protocol) | aig787.confluentinc_cp.normalize_sasl_protocol == 'SCRAM-SHA-256' %}
 confluent.controlcenter.streams.sasl.mechanism=SCRAM-SHA-256
 confluent.controlcenter.streams.sasl.jaas.config=org.apache.kafka.common.security.scram.ScramLoginModule required \
-   username="{{sasl_scram_users.control_center.principal}}" password="{{sasl_scram_users.control_center.password}}";
+   username="{{sasl_scram_users_config.control_center.principal}}" password="{{sasl_scram_users_config.control_center.password}}";
 {% endif %}
 
 {% set schema_registries = groups.get('schema_registry', []) %}

@@ -42,7 +42,7 @@
 
 - name: Set Zookeeper dataDir ownership
   file:
-    path: "{{zookeeper.properties.dataDir}}"
+    path: "{{zookeeper_config.properties.dataDir}}"
     owner: "{{zookeeper_user}}"
     group: "{{zookeeper_group}}"
     state: directory
@@ -50,7 +50,7 @@
 
 - name: Set Ownership of Data Dir files
   file:
-    path: "{{zookeeper.properties.dataDir}}"
+    path: "{{zookeeper_config.properties.dataDir}}"
     owner: "{{zookeeper_user}}"
     group: "{{zookeeper_group}}"
     recurse: true
@@ -58,7 +58,7 @@
 - name: Create Zookeeper myid File
   template:
     src: myid.j2
-    dest: "{{zookeeper.properties.dataDir}}/myid"
+    dest: "{{zookeeper_config.properties.dataDir}}/myid"
     mode: 0555
     owner: "{{zookeeper_user}}"
     group: "{{zookeeper_group}}"
@@ -66,17 +66,16 @@
 - name: Create Zookeeper Config
   template:
     src: zookeeper.properties.j2
-    dest: "{{zookeeper.config_file}}"
+    dest: "{{zookeeper_config_file}}"
     mode: 0400
     owner: "{{zookeeper_user}}"
     group: "{{zookeeper_group}}"
-  register: zookeeper_config
   notify:
     - restart zookeeper
 
 - name: Create Log Directory
   file:
-    path: "{{zookeeper.log_path}}"
+    path: "{{zookeeper_config.log_path}}"
     state: directory
     group: "{{zookeeper_group}}"
     owner: "{{zookeeper_user}}"
@@ -85,7 +84,7 @@
 - name: Create Zookeeper log4j config
   template:
     src: zookeeper_log4j.properties.j2
-    dest: "{{zookeeper.log4j_file}}"
+    dest: "{{zookeeper_config.log4j_file}}"
     mode: 0640
     owner: "{{zookeeper_user}}"
     group: "{{zookeeper_group}}"
@@ -95,7 +94,7 @@
 - name: Create Zookeeper Jaas config
   template:
     src: zookeeper_jaas.conf.j2
-    dest: "{{zookeeper.jaas_file}}"
+    dest: "{{zookeeper_config.jaas_file}}"
     mode: 0640
     owner: "{{zookeeper_user}}"
     group: "{{zookeeper_group}}"
@@ -114,7 +113,7 @@
 
 - name: Create Service Override Directory
   file:
-    path: "{{zookeeper.systemd_override | dirname}}"
+    path: "{{zookeeper_systemd_override | dirname}}"
     owner: "{{zookeeper_user}}"
     group: "{{zookeeper_group}}"
     state: directory
@@ -123,7 +122,7 @@
 - name: Write Service Overrides
   template:
     src: override.conf.j2
-    dest: "{{zookeeper.systemd_override}}"
+    dest: "{{zookeeper_systemd_override}}"
     mode: 0640
     owner: "{{zookeeper_user}}"
     group: "{{zookeeper_group}}"

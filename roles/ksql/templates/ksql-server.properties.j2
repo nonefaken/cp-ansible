@@ -18,7 +18,7 @@ ssl.key.password={{ksql_keystore_keypass}}
 {% if kafka_broker_listeners[ksql_kafka_listener_name]['sasl_protocol'] | default(sasl_protocol) | aig787.confluentinc_cp.normalize_sasl_protocol == 'PLAIN' %}
 sasl.mechanism=PLAIN
 sasl.jaas.config=org.apache.kafka.common.security.plain.PlainLoginModule required \
-   username="{{sasl_plain_users.ksql.principal}}" password="{{sasl_plain_users.ksql.password}}";
+   username="{{sasl_plain_users_config.ksql.principal}}" password="{{sasl_plain_users_config.ksql.password}}";
 {% endif %}
 {% if kafka_broker_listeners[ksql_kafka_listener_name]['sasl_protocol'] | default(sasl_protocol) | aig787.confluentinc_cp.normalize_sasl_protocol == 'GSSAPI' %}
 sasl.mechanism=GSSAPI
@@ -32,7 +32,7 @@ sasl.jaas.config=com.sun.security.auth.module.Krb5LoginModule required \
 {% if kafka_broker_listeners[ksql_kafka_listener_name]['sasl_protocol'] | default(sasl_protocol) | aig787.confluentinc_cp.normalize_sasl_protocol == 'SCRAM-SHA-256' %}
 sasl.mechanism=SCRAM-SHA-256
 sasl.jaas.config=org.apache.kafka.common.security.scram.ScramLoginModule required \
-   username="{{sasl_scram_users.ksql.principal}}" password="{{sasl_scram_users.ksql.password}}";
+   username="{{sasl_scram_users_config.ksql.principal}}" password="{{sasl_scram_users_config.ksql.password}}";
 {% endif %}
 
 {% for key, value in ksql.properties.items() %}
@@ -67,7 +67,7 @@ confluent.monitoring.interceptor.ssl.key.password={{ksql_keystore_keypass}}
 {% if kafka_broker_listeners[ksql_kafka_listener_name]['sasl_protocol'] | default(sasl_protocol) | aig787.confluentinc_cp.normalize_sasl_protocol == 'PLAIN' %}
 confluent.monitoring.interceptor.sasl.mechanism=PLAIN
 confluent.monitoring.interceptor.sasl.jaas.config=org.apache.kafka.common.security.plain.PlainLoginModule required \
-   username="{{sasl_plain_users.ksql.principal}}" password="{{sasl_plain_users.ksql.password}}";
+   username="{{sasl_plain_users_config.ksql.principal}}" password="{{sasl_plain_users_config.ksql.password}}";
 {% endif %}
 {% if kafka_broker_listeners[ksql_kafka_listener_name]['sasl_protocol'] | default(sasl_protocol) | aig787.confluentinc_cp.normalize_sasl_protocol == 'GSSAPI' %}
 confluent.monitoring.interceptor.sasl.mechanism=GSSAPI
@@ -81,5 +81,5 @@ confluent.monitoring.interceptor.sasl.jaas.config=com.sun.security.auth.module.K
 {% if kafka_broker_listeners[ksql_kafka_listener_name]['sasl_protocol'] | default(sasl_protocol) | aig787.confluentinc_cp.normalize_sasl_protocol == 'SCRAM-SHA-256' %}
 confluent.monitoring.interceptor.sasl.mechanism=SCRAM-SHA-256
 confluent.monitoring.interceptor.sasl.jaas.config=org.apache.kafka.common.security.scram.ScramLoginModule required \
-   username="{{sasl_scram_users.ksql.principal}}" password="{{sasl_scram_users.ksql.password}}";
+   username="{{sasl_scram_users_config.ksql.principal}}" password="{{sasl_scram_users_config.ksql.password}}";
 {% endif %}
